@@ -1,33 +1,25 @@
 class Users::SessionsController < Devise::SessionsController
   respond_to :json
-
   private
 
-  def respond_with(resource, _opt = {})
+  def respond_with(resource, _opts = {})
     render json: {
-      status: {
-        code: 200, message: "Logged in successfully.",
-        token: @token,
-        data: {
-          user: UserSerializer.new(resource).serializable_hash[:data][:attributes]
-        }
-      }
+      status: { code: 200, message: "Logged in sucessfully." },
+      data: UserSerializer.new(resource).serializable_hash[:data][:attributes]
     }, status: :ok
   end
 
-  def respond_to_on_destroy
+  def respond_to_on_destroy(_resource)
     if current_user
       render json: {
-        status: 200,
-        message: "Logged out successfully."
+        status: { code: 200, message: "logged out successfully" }
       },
-      status: :ok
+       status: :ok
     else
       render json: {
-        status: 401,
-        message: "Couldn't find an active session."
+        status: { code: 401, message: "Couldn't find an active session." }
       },
-      status: :unauthorized
+       status: :unauthorized
     end
   end
 end
