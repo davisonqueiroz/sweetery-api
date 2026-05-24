@@ -16,7 +16,10 @@ RSpec.describe User, type: :model do
       end
 
       it "email already in use" do
-        duplicated_user = build(:user)
+        duplicated_user = build(:user, email: user.email)
+
+        expect(user.email).to eq(duplicated_user.email)
+
         expect(duplicated_user).to be_invalid
         expect(duplicated_user.errors[:email]).to include("has already been taken")
       end

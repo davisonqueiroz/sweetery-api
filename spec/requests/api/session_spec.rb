@@ -164,7 +164,7 @@ RSpec.describe 'api/session', type: :request do
             },
             required: [ 'status' ]
 
-          example 'application/json', :logout_sucess, {
+          example 'application/json', :logout_error, {
               status: {
                 code: 401,
                 message: "Couldn't find an active session."
@@ -227,17 +227,22 @@ RSpec.describe 'api/session', type: :request do
         end
 
         response '401', 'missing authorization token in request' do
-          schema type: :string
+          schema type: :object,
+            properties: {
+              error: { type: :string }
+            },
+            required: [ 'error' ]
 
-          example 'text/plain', :missing_token, "You need to sign in or sign up before continuing."
+          example 'application/json', :get_current_user_error, {
+              error: "You need to sign in or sign up before continuing."
+            }
 
           let(:Authorization) { nil }
 
           run_test! do |response|
             body = JSON.parse(response.body)
-
-            expect(body).to have_key('status')
-            expect(body['status']['message']).to include("You need to sign in or sign up before continuing.")
+            expect(body).to have_key('error')
+            expect(body['error']).to include("You need to sign in or sign up before continuing.")
           end
         end
       end
