@@ -162,7 +162,7 @@ paths:
           content:
             application/json:
               examples:
-                logout_sucess:
+                logout_error:
                   value:
                     status:
                       code: 401
@@ -226,13 +226,18 @@ paths:
         '401':
           description: missing authorization token in request
           content:
-            text/plain:
-              examples:
-                missing_token:
-                  value: You need to sign in or sign up before continuing.
             application/json:
+              examples:
+                get_current_user_error:
+                  value:
+                    error: You need to sign in or sign up before continuing.
               schema:
-                type: string
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
 servers:
 - url: https://{defaultHost}
   variables:
