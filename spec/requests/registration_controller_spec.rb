@@ -10,7 +10,7 @@ RSpec.describe "RegistrationControllers", type: :request do
     end
 
     it "email already exists" do
-      create(:user)
+      user = create(:user)
 
       post "/signup", params: { user: { email: user.email, password: user.password, password_confirmation: user.password } }
 
