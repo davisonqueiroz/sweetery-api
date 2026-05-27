@@ -1,15 +1,11 @@
 class Role < ApplicationRecord
-  attr_readonly :created_by_id, :name
+  include UniqueStringNormalizer
+  normalizer :name
 
-  before_validation :name_normalizer, on: :create
+  attr_readonly :created_by_id, :name
 
   validates :name, presence: true, uniqueness: true
   validates :active, inclusion: { in: [ true, false ] }
 
   belongs_to :created_by, class_name: "User", optional: true
-  private
-
-  def name_normalizer
-    self.name = name.downcase if name.present?
-  end
 end
