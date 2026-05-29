@@ -10,9 +10,59 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_23_155445) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_24_190712) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "ingredient_categories", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_ingredient_categories_on_name", unique: true
+  end
+
+  create_table "ingredient_products", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "brand", default: "no brand", null: false
+    t.string "commercial_name", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.bigint "ingredient_type_id", null: false
+    t.bigint "package_measurement_unit_id", null: false
+    t.decimal "package_quantity", precision: 10, scale: 3, null: false
+    t.datetime "updated_at", null: false
+    t.index ["commercial_name", "brand", "package_quantity", "package_measurement_unit_id"], name: "idx_on_commercial_name_brand_package_quantity_packa_ae53049e72", unique: true
+  end
+
+  create_table "ingredient_types", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.bigint "base_measurement_unit_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.bigint "ingredient_category_id", null: false
+    t.decimal "min_stock", precision: 10, scale: 3, default: "0.0", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_ingredient_types_on_name", unique: true
+  end
+
+  create_table "measurement_units", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "code", null: false
+    t.decimal "conversion_factor", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.integer "dimension", null: false
+    t.boolean "is_base", default: false, null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_measurement_units_on_code"
+    t.index ["dimension"], name: "index_measurement_units_on_dimension", unique: true, where: "((is_base = true) AND (active = true))"
+    t.index ["name"], name: "index_measurement_units_on_name"
+    t.check_constraint "conversion_factor > 0::numeric", name: "conversion_check"
+  end
 
   create_table "permissions", force: :cascade do |t|
     t.string "action", null: false
@@ -64,6 +114,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_23_155445) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "ingredient_categories", "users", column: "created_by_id"
+  add_foreign_key "ingredient_products", "ingredient_types"
+  add_foreign_key "ingredient_products", "measurement_units", column: "package_measurement_unit_id"
+  add_foreign_key "ingredient_products", "users", column: "created_by_id"
+  add_foreign_key "ingredient_types", "ingredient_categories"
+  add_foreign_key "ingredient_types", "measurement_units", column: "base_measurement_unit_id"
+  add_foreign_key "ingredient_types", "users", column: "created_by_id"
+  add_foreign_key "measurement_units", "users", column: "created_by_id"
   add_foreign_key "role_permissions", "permissions"
   add_foreign_key "role_permissions", "roles"
   add_foreign_key "roles", "users", column: "created_by_id"
