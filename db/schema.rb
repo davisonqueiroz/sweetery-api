@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_24_190712) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_24_191205) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,6 +91,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_190712) do
     t.index ["name"], name: "index_roles_on_name", unique: true
   end
 
+  create_table "suppliers", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "company_name"
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.string "document", null: false
+    t.string "fantasy_name"
+    t.string "name"
+    t.string "observation"
+    t.integer "type_supplier", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_name"], name: "index_suppliers_on_company_name", unique: true
+    t.index ["document"], name: "index_suppliers_on_document", unique: true
+    t.index ["fantasy_name"], name: "index_suppliers_on_fantasy_name", unique: true
+    t.index ["name"], name: "index_suppliers_on_name", unique: true
+    t.check_constraint "type_supplier <> 0 OR name IS NOT NULL AND company_name IS NULL AND fantasy_name IS NULL", name: "pf_name_required"
+    t.check_constraint "type_supplier <> 1 OR company_name IS NOT NULL AND name IS NULL", name: "pj_attributes_required"
+  end
+
   create_table "user_roles", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "created_by_id"
@@ -125,6 +144,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_190712) do
   add_foreign_key "role_permissions", "permissions"
   add_foreign_key "role_permissions", "roles"
   add_foreign_key "roles", "users", column: "created_by_id"
+  add_foreign_key "suppliers", "users", column: "created_by_id"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
   add_foreign_key "user_roles", "users", column: "created_by_id"
