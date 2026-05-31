@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_24_191205) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_24_192336) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -71,6 +71,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_191205) do
     t.string "resource", null: false
     t.datetime "updated_at", null: false
     t.index ["resource", "action"], name: "index_permissions_on_resource_and_action", unique: true
+  end
+
+  create_table "provide_ingredients", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.float "delivery_time"
+    t.integer "delivery_time_type"
+    t.bigint "ingredient_product_id", null: false
+    t.decimal "reference_value", precision: 10, scale: 2, null: false
+    t.bigint "supplier_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["supplier_id", "ingredient_product_id"], name: "idx_on_supplier_id_ingredient_product_id_0832e5c76f", unique: true
+    t.check_constraint "delivery_time IS NULL OR delivery_time > 0::double precision"
+    t.check_constraint "delivery_time IS NULL OR delivery_time_type IS NOT NULL"
+    t.check_constraint "reference_value > 0::numeric"
   end
 
   create_table "role_permissions", force: :cascade do |t|
@@ -141,6 +156,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_191205) do
   add_foreign_key "ingredient_types", "measurement_units", column: "base_measurement_unit_id"
   add_foreign_key "ingredient_types", "users", column: "created_by_id"
   add_foreign_key "measurement_units", "users", column: "created_by_id"
+  add_foreign_key "provide_ingredients", "ingredient_products"
+  add_foreign_key "provide_ingredients", "suppliers"
+  add_foreign_key "provide_ingredients", "users", column: "created_by_id"
   add_foreign_key "role_permissions", "permissions"
   add_foreign_key "role_permissions", "roles"
   add_foreign_key "roles", "users", column: "created_by_id"
