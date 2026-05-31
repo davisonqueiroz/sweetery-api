@@ -61,6 +61,8 @@ group :development, :test do
   gem "factory_bot_rails"
 
   gem "rswag-specs"
+
+  gem "cpf_cnpj"
 end
 
 group :test do
